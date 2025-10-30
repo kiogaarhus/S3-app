@@ -22,6 +22,7 @@ This guide provides step-by-step instructions for installing and configuring GID
 - **npm**: 8.0 or higher (comes with Node.js)
 - **Git**: Latest version
 - **Microsoft SQL Server**: 2017 or later (or access to remote SQL Server)
+- **Microsoft ODBC Driver 17**: Required for SQL Server connections
 
 #### Optional Software
 - **SQL Server Management Studio (SSMS)**: For database management
@@ -57,6 +58,17 @@ This guide provides step-by-step instructions for installing and configuring GID
 3. Verify installation:
    ```bash
    git --version
+   ```
+
+#### Install Microsoft ODBC Driver for SQL Server
+1. Download ODBC Driver 17 from [Microsoft](https://learn.microsoft.com/sql/connect/odbc/download-odbc-driver-for-sql-server)
+2. Choose the appropriate version for your system (x64 for most modern systems)
+3. Run the installer with default settings
+4. Verify installation:
+   ```bash
+   # Test ODBC driver
+   python -c "import pyodbc; print([x for x in pyodbc.drivers() if 'SQL Server' in x])"
+   # Should show: ['ODBC Driver 17 for SQL Server']
    ```
 
 ### Step 2: Database Setup
@@ -190,8 +202,27 @@ cd ..
    ```bash
    cd frontend
    echo "VITE_API_URL=http://localhost:8000" > .env
+   echo "VITE_API_BASE_URL=http://localhost:8000" >> .env
+   echo "VITE_API_CACHE_TTL=300000" >> .env
+   echo "VITE_ENV=development" >> .env
    echo "VITE_APP_TITLE=GIDAS Explorer" >> .env
    cd ..
+   ```
+
+2. Frontend environment variables explained:
+   ```env
+   # API Configuration
+   VITE_API_URL=http://localhost:8000          # Backend API URL
+   VITE_API_BASE_URL=http://localhost:8000    # Alternative API base URL
+
+   # Cache Configuration (milliseconds)
+   VITE_API_CACHE_TTL=300000                 # Cache API responses for 5 minutes
+
+   # Environment
+   VITE_ENV=development                       # Environment type (development/production)
+
+   # Application
+   VITE_APP_TITLE=GIDAS Explorer              # Application title
    ```
 
 ### Step 6: Start the Application
@@ -296,7 +327,8 @@ DATABASE_URL=sqlalchemy+pyodbc://domain\\username:password@server.company.com/GI
 **Problem**: `sqlalchemy.exc.DBAPIError: (pyodbc.InterfaceError) ('IM002', '[IM002]...')`
 
 **Solutions**:
-- Install Microsoft ODBC Driver 17 for SQL Server
+- Install Microsoft ODBC Driver 17 for SQL Server (see Step 1)
+- Verify ODBC driver installation: `python -c "import pyodbc; print(pyodbc.drivers())"`
 - Verify SQL Server is running and accepting connections
 - Check firewall settings (port 1433)
 - Ensure SQL Server allows TCP/IP connections
@@ -305,6 +337,7 @@ DATABASE_URL=sqlalchemy+pyodbc://domain\\username:password@server.company.com/GI
 ```bash
 # Test ODBC driver
 python -c "import pyodbc; print([x for x in pyodbc.drivers() if 'SQL Server' in x])"
+# Should show: ['ODBC Driver 17 for SQL Server']
 
 # Test telnet connection
 telnet your-server-name 1433
