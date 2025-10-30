@@ -1,0 +1,39 @@
+# DBT Core dependencies for GIDAS Explorer project
+dbt-core>=1.6.0,<2.0.0
+dbt-sqlserver>=1.6.0,<2.0.0
+
+# Backend Framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+
+# Database & ORM
+sqlalchemy>=2.0.0
+pyodbc>=5.0.0
+pydantic>=2.5.0
+
+# Additional utilities
+pandas>=2.0.0
+python-multipart>=0.0.6
+fastapi-cache2>=0.2.1
+reportlab>=4.0.0  # PDF generation
+openpyxl>=3.1.0  # Excel export (already in use)
+
+# Authentication & Security
+python-jose[cryptography]>=3.3.0  # JWT token generation
+passlib[bcrypt]>=1.7.4  # Password hashing
+python-dateutil>=2.8.2  # Date utilities
+
+# Testing dependencies
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-asyncio>=0.21.0
+httpx>=0.25.0
+
+# Code quality tools (development)
+black>=23.0.0
+isort>=5.12.0
+flake8>=6.0.0
+mypy>=1.5.0
+
+# Optional: Additional useful packages
+# dbt-utils>=1.1.0  # Uncomment if you want to use dbt utility macros

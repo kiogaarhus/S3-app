@@ -1,0 +1,237 @@
+/**
+ * Search Filter Modal Styles
+ * Based on docs/REACT_DESIGN_SYSTEM.md
+ */
+
+/* Modal Overlay */
+.filter-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Modal Container */
+.filter-modal {
+  background-color: var(--surface-elevated);
+  border-radius: 0.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header */
+.filter-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-6);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.filter-modal-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--text-primary);
+}
+
+.filter-modal-title h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.filter-modal-close {
+  padding: var(--space-2);
+  background: transparent;
+  border: none;
+  border-radius: 0.375rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-modal-close:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+/* Content */
+.filter-modal-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-6);
+}
+
+/* Filter Group */
+.filter-group {
+  margin-bottom: var(--space-6);
+}
+
+.filter-group:last-child {
+  margin-bottom: 0;
+}
+
+.filter-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Filter Options (Radio buttons) */
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.filter-radio {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--border-light);
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-radio:hover {
+  background-color: var(--bg-tertiary);
+  border-color: var(--primary-500);
+}
+
+.filter-radio input[type='radio'] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.filter-radio span {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+/* Date Range */
+.filter-date-range {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.filter-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.filter-input-group label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Filter Input */
+.filter-input,
+.filter-select {
+  width: 100%;
+  padding: var(--space-3);
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  background-color: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: 0.375rem;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.filter-input:focus,
+.filter-select:focus {
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.filter-select {
+  cursor: pointer;
+}
+
+/* Footer */
+.filter-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-6);
+  border-top: 1px solid var(--border-light);
+}
+
+.filter-modal-actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+/* Dark Mode */
+[data-theme='dark'] .filter-modal-overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .filter-modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .filter-date-range {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-modal-footer {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .filter-modal-actions {
+    width: 100%;
+  }
+
+  .filter-modal-actions button {
+    flex: 1;
+  }
+}

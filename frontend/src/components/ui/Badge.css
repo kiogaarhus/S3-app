@@ -1,0 +1,114 @@
+/* Badge Component Styling */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  border-radius: var(--radius-md);
+  line-height: 1;
+}
+
+.badge-success {
+  background-color: var(--success-50);
+  color: var(--success-600);
+}
+
+[data-theme="dark"] .badge-success {
+  background-color: var(--success-600);
+  color: var(--success-50);
+}
+
+.badge-warning {
+  background-color: var(--warning-50);
+  color: var(--warning-600);
+}
+
+[data-theme="dark"] .badge-warning {
+  background-color: var(--warning-600);
+  color: var(--warning-50);
+}
+
+.badge-error {
+  background-color: var(--error-50);
+  color: var(--error-600);
+}
+
+[data-theme="dark"] .badge-error {
+  background-color: var(--error-600);
+  color: var(--error-50);
+}
+
+.badge-info {
+  background-color: var(--info-50);
+  color: var(--info-600);
+}
+
+[data-theme="dark"] .badge-info {
+  background-color: var(--info-600);
+  color: var(--info-50);
+}
+
+.badge-neutral {
+  background-color: var(--gray-100);
+  color: var(--gray-700);
+}
+
+[data-theme="dark"] .badge-neutral {
+  background-color: var(--gray-700);
+  color: var(--gray-100);
+}
+
+.badge-default {
+  background-color: var(--gray-100);
+  color: var(--gray-700);
+}
+
+[data-theme="dark"] .badge-default {
+  background-color: var(--gray-700);
+  color: var(--gray-100);
+}
+
+.badge-primary {
+  background-color: var(--primary-50);
+  color: var(--primary-600);
+}
+
+[data-theme="dark"] .badge-primary {
+  background-color: var(--primary-600);
+  color: var(--primary-50);
+}
+
+/* Projekttype-specific badges */
+.badge-separering {
+  background-color: #DBEAFE; /* Blue-50 */
+  color: #1E40AF; /* Blue-800 */
+}
+
+[data-theme="dark"] .badge-separering {
+  background-color: #1E40AF; /* Blue-800 */
+  color: #DBEAFE; /* Blue-50 */
+}
+
+.badge-aabentland {
+  background-color: #D1FAE5; /* Green-50 */
+  color: #065F46; /* Green-800 */
+}
+
+[data-theme="dark"] .badge-aabentland {
+  background-color: #065F46; /* Green-800 */
+  color: #D1FAE5; /* Green-50 */
+}
+
+.badge-other {
+  background-color: var(--gray-100);
+  color: var(--gray-700);
+}
+
+[data-theme="dark"] .badge-other {
+  background-color: var(--gray-700);
+  color: var(--gray-100);
+}
