@@ -126,9 +126,10 @@ pip install fastapi uvicorn sqlalchemy pyodbc pydantic python-multipart python-j
 ```
 
 #### Configure Environment Variables
-1. Copy the environment template:
+1. Create `.env` file with your configuration:
    ```bash
-   copy .env.example .env
+   # Create new .env file
+   echo. > .env
    ```
 
 2. Edit `.env` file with your configuration:

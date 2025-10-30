@@ -77,11 +77,8 @@ Full-stack web application for managing and analyzing environmental case data fr
 
 4. **Configuration**
    ```bash
-   # Copy environment template
-   cp .env.example .env
-
-   # Edit .env with your database credentials
-   # See .env.example for required variables
+   # Create .env file with your database credentials
+   # See example in Installation section
    ```
 
 5. **Run Application**
@@ -129,7 +126,6 @@ gidas_explorer/
 │   │   └── utils/            # Utility functions
 │   ├── package.json
 │   └── vite.config.ts
-├── .env.example              # Environment variables template
 ├── .gitignore               # Git ignore rules
 ├── requirements.txt         # Python dependencies
 └── README.md               # This file
