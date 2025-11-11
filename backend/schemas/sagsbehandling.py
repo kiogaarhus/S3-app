@@ -78,6 +78,7 @@ class SagOut(SagBase):
     matrnr: Optional[str] = Field(None, description="Cadastral number (matrikelnummer)")
     ejer: Optional[str] = Field(None, description="Owner information")
     fuld_adresse: Optional[str] = Field(None, description="Full address string")
+    anlaegs_info: Optional[str] = Field(None, description="Facility information (BEMARKNING_Rens from tblAdresseEjendom)")
 
     # Undersøgelse & Varsel
     SkalUndersøges: Optional[str] = Field(None, description="Should be investigated")

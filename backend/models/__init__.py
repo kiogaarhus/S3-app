@@ -22,6 +22,7 @@ from .amo import (
     BBRGrundAfloeb,
     BBRGrund,
 )
+from .adresse_ejendom import AdresseEjendom
 
 __all__ = [
     "Base",
@@ -41,4 +42,5 @@ __all__ = [
     "AMOProjekttypeReg",
     "BBRGrundAfloeb",
     "BBRGrund",
+    "AdresseEjendom",
 ]

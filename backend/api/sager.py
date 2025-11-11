@@ -38,6 +38,7 @@ from backend.schemas.sagsbehandling import (
     SagDetailResponse
 )
 from backend.utils.pagination import paginate, PaginatedResponse, PaginationMeta
+from backend.utils.anlaegs_info import get_anlaegs_info_by_adresse
 
 router = APIRouter(prefix="/api/sager", tags=["sager"])
 
@@ -119,6 +120,60 @@ async def debug_table_columns(sag_id: int, db: Session = Depends(get_db)):
     }
 
 
+@router.get("/debug/events/{sag_id}")
+async def debug_events(sag_id: int, db: Session = Depends(get_db)):
+    """Debug endpoint to check ALL events for a case, including hidden ones."""
+    from backend.models.amo import AMOHændelser, AMOHændelsestyper
+    from sqlalchemy import text
+
+    # Check if case exists
+    sag = db.query(AMOSagsbehandling).filter(AMOSagsbehandling.Id == sag_id).first()
+    if not sag:
+        return {"error": f"Sag {sag_id} not found"}
+
+    # Get ALL events (including hidden) with raw SQL
+    raw_events = db.execute(
+        text("""
+            SELECT h.*, ht.HændelsesType
+            FROM dbo.AMOHændelser h
+            LEFT JOIN dbo.AMOHændelsestyper ht ON h.TypeID = ht.Id
+            WHERE h.SagsID = :sag_id
+            ORDER BY h.Dato DESC
+        """),
+        {"sag_id": sag_id}
+    ).fetchall()
+
+    # Get count of all events
+    total_count = len(raw_events) if raw_events else 0
+
+    # Get count of visible events (Skjul != True)
+    visible_events = [e for e in raw_events if not e._mapping.get('Skjul')]
+    visible_count = len(visible_events)
+
+    # Format events for inspection
+    events_data = []
+    for event in raw_events:
+        events_data.append({
+            "id": event._mapping.get('Id'),
+            "sagsid": event._mapping.get('SagsID'),
+            "typeid": event._mapping.get('TypeID'),
+            "dato": event._mapping.get('Dato'),
+            "bemaerkning": event._mapping.get('Bemærkning'),
+            "init": event._mapping.get('Init'),
+            "skjul": event._mapping.get('Skjul'),
+            "link": event._mapping.get('Link'),
+            "haendelsestype": event._mapping.get('HændelsesType')
+        })
+
+    return {
+        "sag_id": sag_id,
+        "total_events": total_count,
+        "visible_events": visible_count,
+        "hidden_events": total_count - visible_count,
+        "events": events_data
+    }
+
+
 # Helper function for FK validation (Subtask 1.2)
 def validate_projekt_exists(projekt_id: int, db: Session) -> AMOProjekt:
     """
@@ -181,6 +236,7 @@ def enrich_sag_with_relations(sag: AMOSagsbehandling, db: Session) -> dict:
         "matrnr": None,
         "ejer": None,
         "fuld_adresse": None,
+        "anlaegs_info": None,
         # Undersøgelse & Varsel
         "SkalUndersøges": sag.SkalUndersøges,
         "SkalUndersøgesDato": sag.SkalUndersøgesDato,
@@ -253,6 +309,12 @@ def enrich_sag_with_relations(sag: AMOSagsbehandling, db: Session) -> dict:
 
     if sag.EjerEtFelt:
         sag_dict["ejer"] = sag.EjerEtFelt
+
+    # Fetch Anlægs Info from tblAdresseEjendom based on address
+    # This is relevant for Åben land cases to show facility information
+    if sag.Adresse:
+        anlaegs_info = get_anlaegs_info_by_adresse(db, sag.Adresse)
+        sag_dict["anlaegs_info"] = anlaegs_info
 
     return sag_dict
 
@@ -695,7 +757,7 @@ async def export_sager_csv(
     - Optional 'columns' parameter (comma-separated)
     - If not provided, exports all default columns
     - Available columns: id, projekt_id, projekt_navn, projekttype_navn, bemærkning,
-      oprettet_dato, afsluttet_dato, faerdigmeldt, faerdigmelding_dato, påbud, påbudsfrist, case_age
+      oprettet_dato, afsluttet_dato, faerdigmeldt, faerdigmelding_dato, påbud, påbudsfrist, case_age, anlaegs_info
 
     **Returns:**
     - CSV file download with filename: sager_export_{timestamp}.csv
@@ -752,6 +814,9 @@ async def export_sager_csv(
         # BBR kolonner
         'bbr_afløbsforhold': {'label': 'BBR Afløbsforhold', 'default': False},
         'bbr_vandforsyning': {'label': 'BBR Vandforsyning', 'default': False},
+
+        # Anlægs Info
+        'anlaegs_info': {'label': 'Anlægs info', 'default': False},
     }
 
     # Parse selected columns
@@ -777,10 +842,11 @@ async def export_sager_csv(
     if faerdigmeldt is not None:
         if faerdigmeldt == 0:
             # Active cases: not færdigmeldt AND not afsluttet
+            # Handle NULL values explicitly (NULL != 1 returns NULL in SQL, not TRUE)
             query = query.filter(
-                AMOSagsbehandling.FærdigmeldtInt != 1,
-                AMOSagsbehandling.AfsluttetInt != 1,
-                AMOSagsbehandling.AfsluttetInt != -1
+                or_(AMOSagsbehandling.FærdigmeldtInt != 1, AMOSagsbehandling.FærdigmeldtInt.is_(None)),
+                or_(AMOSagsbehandling.AfsluttetInt != 1, AMOSagsbehandling.AfsluttetInt.is_(None)),
+                or_(AMOSagsbehandling.AfsluttetInt != -1, AMOSagsbehandling.AfsluttetInt.is_(None))
             )
         elif faerdigmeldt == -1:
             # Closed cases: afsluttet (regardless of færdigmeldt status)
@@ -993,6 +1059,9 @@ async def export_sager_csv(
                 row_data.append(bbr_data['afloebsforhold'] if bbr_data else '')
             elif col == 'bbr_vandforsyning':
                 row_data.append(bbr_data['vandforsyning'] if bbr_data else '')
+            # Anlægs Info
+            elif col == 'anlaegs_info':
+                row_data.append(enriched.get('anlaegs_info', ''))
             else:
                 row_data.append('')  # Fallback for unknown columns
 
@@ -1017,6 +1086,7 @@ async def export_sager_excel(
     projekt_id: Optional[int] = Query(None),
     projekttype_id: Optional[int] = Query(None),
     projekttype_navn: Optional[str] = Query(None),
+    projekt_navn: Optional[str] = Query(None),
     faerdigmeldt: Optional[int] = Query(None),
     paabud: Optional[str] = Query(None),
     oprettet_fra: Optional[datetime] = Query(None),
@@ -1034,7 +1104,7 @@ async def export_sager_excel(
     - Optional 'columns' parameter (comma-separated)
     - If not provided, exports all default columns
     - Available columns: id, projekt_id, projekt_navn, projekttype_navn, bemærkning,
-      oprettet_dato, afsluttet_dato, faerdigmeldt, faerdigmelding_dato, påbud, påbudsfrist, case_age
+      oprettet_dato, afsluttet_dato, faerdigmeldt, faerdigmelding_dato, påbud, påbudsfrist, case_age, anlaegs_info
 
     **Returns:**
     - Excel file download with filename: sager_export_{timestamp}.xlsx
@@ -1093,6 +1163,9 @@ async def export_sager_excel(
         # BBR kolonner
         'bbr_afløbsforhold': {'label': 'BBR Afløbsforhold', 'default': False},
         'bbr_vandforsyning': {'label': 'BBR Vandforsyning', 'default': False},
+
+        # Anlægs Info
+        'anlaegs_info': {'label': 'Anlægs info', 'default': False},
     }
 
     # Parse selected columns (same logic as CSV)
@@ -1118,10 +1191,11 @@ async def export_sager_excel(
     if faerdigmeldt is not None:
         if faerdigmeldt == 0:
             # Active cases: not færdigmeldt AND not afsluttet
+            # Handle NULL values explicitly (NULL != 1 returns NULL in SQL, not TRUE)
             query = query.filter(
-                AMOSagsbehandling.FærdigmeldtInt != 1,
-                AMOSagsbehandling.AfsluttetInt != 1,
-                AMOSagsbehandling.AfsluttetInt != -1
+                or_(AMOSagsbehandling.FærdigmeldtInt != 1, AMOSagsbehandling.FærdigmeldtInt.is_(None)),
+                or_(AMOSagsbehandling.AfsluttetInt != 1, AMOSagsbehandling.AfsluttetInt.is_(None)),
+                or_(AMOSagsbehandling.AfsluttetInt != -1, AMOSagsbehandling.AfsluttetInt.is_(None))
             )
         elif faerdigmeldt == -1:
             # Closed cases: afsluttet (regardless of færdigmeldt status)
@@ -1351,6 +1425,9 @@ async def export_sager_excel(
                 row_data.append(bbr_data['afloebsforhold'] if bbr_data else '')
             elif col == 'bbr_vandforsyning':
                 row_data.append(bbr_data['vandforsyning'] if bbr_data else '')
+            # Anlægs Info
+            elif col == 'anlaegs_info':
+                row_data.append(enriched.get('anlaegs_info', ''))
             else:
                 row_data.append('')  # Fallback for unknown columns
 
@@ -1632,6 +1709,29 @@ async def export_sag_pdf(
         elements.append(paabud_table)
         elements.append(Spacer(1, 0.5*cm))
 
+    # Anlægs Info Section (if applicable)
+    if enriched.get('anlaegs_info') and enriched.get('anlaegs_info') != "ingen bemærkninger":
+        elements.append(Paragraph("🏗️ Anlægs info", heading_style))
+
+        anlaegs_para = Paragraph(enriched['anlaegs_info'], value_style)
+        anlaegs_data = [['Anlægs info', anlaegs_para]]
+
+        anlaegs_table = Table(anlaegs_data, colWidths=[5*cm, 12*cm])
+        anlaegs_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#eff6ff')),
+            ('TEXTCOLOR', (0, 0), (0, -1), colors.HexColor('#1e40af')),
+            ('TEXTCOLOR', (1, 0), (1, -1), colors.HexColor('#111827')),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ('TOPPADDING', (0, 0), (-1, -1), 8),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e5e7eb'))
+        ]))
+        elements.append(anlaegs_table)
+        elements.append(Spacer(1, 0.5*cm))
+
     # Task 13.7: Hændelser Section
     from backend.models.amo import AMOHændelser, AMOHændelsestyper
     haendelser = (
@@ -1786,10 +1886,10 @@ async def get_sag_haendelser(
             detail=f"Sag with ID {id} not found"
         )
 
-    # Query hændelser with join to get type name
+    # Query hændelser with LEFT JOIN to get type name (includes events with TypeID = null)
     haendelser = (
         db.query(AMOHændelser, AMOHændelsestyper.HændelsesType)
-        .join(AMOHændelsestyper, AMOHændelser.TypeID == AMOHændelsestyper.Id)
+        .outerjoin(AMOHændelsestyper, AMOHændelser.TypeID == AMOHændelsestyper.Id)
         .filter(AMOHændelser.SagsID == id)
         .filter(or_(AMOHændelser.Skjul == False, AMOHændelser.Skjul.is_(None)))
         .order_by(desc(AMOHændelser.Dato))
@@ -1802,7 +1902,7 @@ async def get_sag_haendelser(
         data.append({
             "id": haendelse.Id,
             "dato": haendelse.Dato,
-            "haendelsestype": type_navn,
+            "haendelsestype": type_navn or "Uden type",  # Provide default for null types
             "bemaerkning": haendelse.Bemærkning,
             "init": haendelse.Init,
             "link": haendelse.Link

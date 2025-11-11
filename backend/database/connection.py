@@ -4,11 +4,14 @@ Compatible with existing dbt configuration.
 """
 import logging
 import os
+from pathlib import Path
 from typing import Optional
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Load environment variables from .env file (search parent directories)
+# This allows .env to be in project root while backend runs from backend/
+dotenv_path = find_dotenv(usecwd=True)
+load_dotenv(dotenv_path)
 
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.exc import SQLAlchemyError
@@ -17,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 # Default database URL matching dbt configuration
 DEFAULT_DB_URL = (
-    "mssql+pyodbc://srvsql29/Envidan_Gidas_SpvPlanDyn_Test"
+    "mssql+pyodbc://srvsql29/Envidan_Gidas_SpvPlanDyn"
     "?driver=ODBC+Driver+18+for+SQL+Server"
     "&trusted_connection=yes"
     "&encrypt=no"

@@ -58,6 +58,9 @@ const DEFAULT_COLUMNS: ExportColumn[] = [
   // BBR kolonner
   { key: 'bbr_afløbsforhold', label: 'BBR Afløbsforhold', included: false },
   { key: 'bbr_vandforsyning', label: 'BBR Vandforsyning', included: false },
+
+  // Anlægs Info
+  { key: 'anlaegs_info', label: 'Anlægs info', included: false },
 ];
 
 export const ExportModal: React.FC<ExportModalProps> = ({

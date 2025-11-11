@@ -12,7 +12,7 @@ This directory contains SQL migration scripts for the GIDAS Explorer database.
 
 ### Using SQL Server Management Studio (SSMS)
 
-1. Connect to the database: `Envidan_Gidas_SpvPlanDyn_Test`
+1. Connect to the database: `Envidan_Gidas_SpvPlanDyn`
 2. Open the migration script in SSMS
 3. Execute the script (F5)
 4. Verify indexes were created:
@@ -29,7 +29,7 @@ This directory contains SQL migration scripts for the GIDAS Explorer database.
 ### Using sqlcmd (Command Line)
 
 ```bash
-sqlcmd -S srvsql29 -d Envidan_Gidas_SpvPlanDyn_Test -E -i 001_add_dashboard_indexes.sql
+sqlcmd -S srvsql29 -d Envidan_Gidas_SpvPlanDyn -E -i 001_add_dashboard_indexes.sql
 ```
 
 ## Index Strategy

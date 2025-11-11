@@ -1,6 +1,6 @@
 """
 SQLAlchemy models for AMO database tables.
-Maps to existing database schema in Envidan_Gidas_SpvPlanDyn_Test.
+Maps to existing database schema in Envidan_Gidas_SpvPlanDyn.
 """
 from datetime import datetime
 from typing import Optional

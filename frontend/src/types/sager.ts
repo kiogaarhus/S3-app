@@ -38,6 +38,7 @@ export interface Sag {
   matrnr?: string | null;
   ejer?: string | null;
   fuld_adresse?: string | null;
+  anlaegs_info?: string | null; // Facility information from tblAdresseEjendom
 
   // Undersøgelse & Varsel
   SkalUndersøges?: string | null;

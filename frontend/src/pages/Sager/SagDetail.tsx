@@ -216,6 +216,22 @@ export const SagDetail = () => {
         </Card>
       )}
 
+      {/* Anlægs Info - Facility information from tblAdresseEjendom */}
+      {sag.anlaegs_info && (
+        <Card>
+          <div className="p-6">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-primary">
+              🏗️ Anlægs info
+            </h2>
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <p className="text-primary whitespace-pre-wrap">
+                {sag.anlaegs_info}
+              </p>
+            </div>
+          </div>
+        </Card>
+      )}
+
       {/* Case Information */}
       <Card>
         <div className="p-6">
