@@ -75,8 +75,10 @@ frontend/build/
 ehthumbs.db
 Thumbs.db
 
-# MCP and Claude
-#.mcp.json
+# MCP and Claude - Development tools
+.mcp.json
+.taskmaster/
+CLAUDE.md
 
 # Project specific
 *.tmp
@@ -87,18 +89,4 @@ debug_*
 test_*.py
 
 logs
-dev-debug.log
-# Dependency directories
-# Editor directories and files
-.idea
-.vscode
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-# OS specific
-
-# Task files
-# tasks.json
-# tasks/ 
+dev-debug.log 
