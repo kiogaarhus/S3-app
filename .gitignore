@@ -52,11 +52,12 @@ frontend/dist/
 frontend/build/
 *.tsbuildinfo
 
-# Environment variables
+# Environment variables (but keep .env.example files)
 .env
 .env.local
 .env.production
 .env.development
+!.env.example
 
 # IDEs
 .vscode/
@@ -75,7 +76,7 @@ ehthumbs.db
 Thumbs.db
 
 # MCP and Claude
-.mcp.json
+#.mcp.json
 
 # Project specific
 *.tmp
@@ -84,3 +85,20 @@ Thumbs.db
 temp_*
 debug_*
 test_*.py
+
+logs
+dev-debug.log
+# Dependency directories
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# OS specific
+
+# Task files
+# tasks.json
+# tasks/ 

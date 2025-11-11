@@ -50,17 +50,41 @@ if errorlevel 1 (
 )
 cd ..
 
-echo [4/4] Tjekker .env fil...
-if not exist backend\.env (
-    echo.
-    echo ADVARSEL: .env fil findes ikke i backend mappen!
-    echo Du skal oprette backend\.env med dine database credentials.
-    echo.
-    echo Eksempel:
-    echo DATABASE_URL=mssql+pyodbc://username:password@server/database?driver=ODBC+Driver+17+for+SQL+Server
-    echo API_HOST=0.0.0.0
-    echo API_PORT=8000
-    echo.
+echo [4/5] Tjekker backend .env fil...
+if not exist .env (
+    if exist .env.example (
+        echo Kopierer .env.example til .env...
+        copy .env.example .env
+        echo.
+        echo VIGTIGT: Tjek .env filen og opdater database credentials hvis noedvendigt!
+        echo.
+    ) else (
+        echo.
+        echo ADVARSEL: .env fil findes ikke!
+        echo Du skal oprette .env med dine database credentials.
+        echo.
+        echo Eksempel:
+        echo GIDAS_DB_URL=mssql+pyodbc://srvsql29/Envidan_Gidas_SpvPlanDyn?driver=ODBC+Driver+18+for+SQL+Server^&trusted_connection=yes^&TrustServerCertificate=yes
+        echo.
+    )
+) else (
+    echo Backend .env fil fundet - springer over.
+)
+
+echo [5/5] Tjekker frontend .env fil...
+if not exist frontend\.env (
+    if exist frontend\.env.example (
+        echo Kopierer frontend\.env.example til frontend\.env...
+        copy frontend\.env.example frontend\.env
+        echo Frontend .env fil oprettet.
+    ) else (
+        echo.
+        echo ADVARSEL: frontend\.env.example fil findes ikke!
+        echo Frontend vil maaske ikke kunne forbinde til backend korrekt.
+        echo.
+    )
+) else (
+    echo Frontend .env fil fundet - springer over.
 )
 
 echo.
@@ -69,7 +93,7 @@ echo Installation komplet!
 echo ====================================
 echo.
 echo Naeste skridt:
-echo 1. Opret backend\.env fil med dine database credentials
+echo 1. Tjek .env fil og opdater database credentials hvis noedvendigt
 echo 2. Koer start.bat for at starte applikationen
 echo.
 pause

@@ -24,10 +24,10 @@ async def startup():
     """Initialize cache on application startup."""
     await init_cache()
 
-# CORS for Reflex and Vite frontend
+# CORS for Vite frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173"],
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

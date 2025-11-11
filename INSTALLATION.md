@@ -138,33 +138,25 @@ pip install fastapi uvicorn sqlalchemy pyodbc pydantic python-multipart python-j
 ```
 
 #### Configure Environment Variables
-1. Create `.env` file with your configuration:
-   ```bash
-   # Create new .env file
-   echo. > .env
-   ```
 
-2. Edit `.env` file with your configuration:
-   ```bash
-   # Open in Notepad or VS Code
-   notepad .env
-   ```
+**Backend Configuration (.env in project root)**
 
-3. Set your database connection:
-   ```env
-   # Database Configuration - UPDATE THESE VALUES
-   DATABASE_URL=sqlalchemy+pyodbc://YOUR_USERNAME:YOUR_PASSWORD@YOUR_SERVER_NAME/GIDAS_Explorer?driver=ODBC+Driver+17+for+SQL+Server
+The installation script automatically creates a `.env` file from `.env.example`. Edit this file with your database credentials:
 
-   # API Configuration
-   API_HOST=0.0.0.0
-   API_PORT=8000
+```env
+# Database Configuration - UPDATE WITH YOUR VALUES
+GIDAS_DB_URL=mssql+pyodbc://YOUR_SERVER/YOUR_DATABASE?driver=ODBC+Driver+18+for+SQL+Server&trusted_connection=yes&TrustServerCertificate=yes
+```
 
-   # Security - GENERATE NEW SECRET KEY
-   SECRET_KEY=your-super-secret-key-here-change-this
+**Frontend Configuration (frontend/.env)**
 
-   # CORS Settings (development)
-   ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
-   ```
+The installation script automatically creates `frontend/.env` from `frontend/.env.example`. Default values usually don't need changes:
+
+```env
+VITE_API_BASE_URL=http://localhost:8000
+VITE_API_CACHE_TTL=300000
+VITE_ENV=development
+```
 
 #### Test Database Connection
 ```bash
@@ -197,50 +189,33 @@ npm install
 cd ..
 ```
 
-#### Configure Frontend Environment
-1. Create frontend environment file:
-   ```bash
-   cd frontend
-   echo "VITE_API_URL=http://localhost:8000" > .env
-   echo "VITE_API_BASE_URL=http://localhost:8000" >> .env
-   echo "VITE_API_CACHE_TTL=300000" >> .env
-   echo "VITE_ENV=development" >> .env
-   echo "VITE_APP_TITLE=GIDAS Explorer" >> .env
-   cd ..
-   ```
-
-2. Frontend environment variables explained:
-   ```env
-   # API Configuration
-   VITE_API_URL=http://localhost:8000          # Backend API URL
-   VITE_API_BASE_URL=http://localhost:8000    # Alternative API base URL
-
-   # Cache Configuration (milliseconds)
-   VITE_API_CACHE_TTL=300000                 # Cache API responses for 5 minutes
-
-   # Environment
-   VITE_ENV=development                       # Environment type (development/production)
-
-   # Application
-   VITE_APP_TITLE=GIDAS Explorer              # Application title
-   ```
+**Note:** The `install.bat` script automatically handles all configuration including creating `frontend/.env` from `frontend/.env.example`. Manual configuration is only needed if you didn't use the install script.
 
 ### Step 6: Start the Application
 
-#### Start Backend Server
+#### Automated Start (Recommended on Windows)
+Simply double-click `start.bat` or run:
+```bash
+start.bat
+```
+
+This will automatically:
+- Start the backend server on http://localhost:8000
+- Start the frontend server on http://localhost:5173
+- Open both in separate windows
+
+#### Manual Start (Alternative)
+
+**Backend Server:**
 1. Open a new terminal/command prompt
 2. Navigate to project root
-3. Activate virtual environment:
+3. Activate virtual environment and start backend:
    ```bash
    venv\Scripts\activate  # Windows
-   ```
-4. Start the backend:
-   ```bash
-   cd backend
-   uvicorn main:app --reload --port 8000
+   uvicorn backend.main:app --reload --port 8000
    ```
 
-#### Start Frontend Development Server
+**Frontend Development Server:**
 1. Open another terminal/command prompt
 2. Navigate to project root
 3. Start the frontend:
@@ -290,34 +265,45 @@ except Exception as e:
 
 ### Database Connection String Format
 
-#### Windows Authentication
+**Important:** Use `mssql+pyodbc://` prefix (NOT `sqlalchemy+pyodbc://`)
+
+#### Windows Authentication (Recommended)
 ```env
-DATABASE_URL=sqlalchemy+pyodbc://@YOUR_SERVER_NAME/GIDAS_Explorer?driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes
+GIDAS_DB_URL=mssql+pyodbc://YOUR_SERVER_NAME/DATABASE_NAME?driver=ODBC+Driver+18+for+SQL+Server&trusted_connection=yes&TrustServerCertificate=yes
 ```
 
 #### SQL Server Authentication
 ```env
-DATABASE_URL=sqlalchemy+pyodbc://USERNAME:PASSWORD@YOUR_SERVER_NAME/GIDAS_Explorer?driver=ODBC+Driver+17+for+SQL+Server
+GIDAS_DB_URL=mssql+pyodbc://USERNAME:PASSWORD@YOUR_SERVER_NAME/DATABASE_NAME?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes
 ```
 
 #### Connection String Examples
 ```env
-# Local SQL Server Express
-DATABASE_URL=sqlalchemy+pyodbc://sa:YourPassword@localhost/SQLEXPRESS/GIDAS_Explorer?driver=ODBC+Driver+17+for+SQL+Server
+# Local SQL Server Express with Windows Authentication
+GIDAS_DB_URL=mssql+pyodbc://localhost\SQLEXPRESS/GIDAS_Explorer?driver=ODBC+Driver+18+for+SQL+Server&trusted_connection=yes&TrustServerCertificate=yes
 
-# Remote SQL Server
-DATABASE_URL=sqlalchemy+pyodbc://domain\\username:password@server.company.com/GIDAS_Explorer?driver=ODBC+Driver+17+for+SQL+Server
+# Remote SQL Server with SQL Authentication
+GIDAS_DB_URL=mssql+pyodbc://sa:YourPassword@server.company.com/GIDAS_Explorer?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes
+
+# Production example (from .env.example)
+GIDAS_DB_URL=mssql+pyodbc://srvsql29/Envidan_Gidas_SpvPlanDyn?driver=ODBC+Driver+18+for+SQL+Server&trusted_connection=yes&TrustServerCertificate=yes
 ```
 
 ### Environment Variables Reference
 
+#### Backend (.env in project root)
+
 | Variable | Required | Description | Example |
 |----------|----------|-------------|---------|
-| `DATABASE_URL` | ✅ | Full database connection string | See formats above |
-| `SECRET_KEY` | ✅ | JWT signing key | Generate with `openssl rand -hex 32` |
-| `API_HOST` | ❌ | Backend bind address | `0.0.0.0` |
-| `API_PORT` | ❌ | Backend port | `8000` |
-| `ALLOWED_ORIGINS` | ❌ | CORS allowed origins | `http://localhost:3000` |
+| `GIDAS_DB_URL` | ✅ | Full database connection string | See formats above |
+
+#### Frontend (frontend/.env)
+
+| Variable | Required | Description | Example |
+|----------|----------|-------------|---------|
+| `VITE_API_BASE_URL` | ✅ | Backend API URL | `http://localhost:8000` |
+| `VITE_API_CACHE_TTL` | ❌ | Cache duration in ms | `300000` (5 minutes) |
+| `VITE_ENV` | ❌ | Environment type | `development` or `production` |
 
 ## 🚨 Troubleshooting
 

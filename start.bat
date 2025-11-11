@@ -13,14 +13,12 @@ if not exist venv\Scripts\activate.bat (
 )
 
 REM Check if .env exists
-if not exist backend\.env (
-    echo ADVARSEL: backend\.env fil findes ikke!
+if not exist .env (
+    echo ADVARSEL: .env fil findes ikke!
     echo Systemet kan ikke koere uden database konfiguration.
     echo.
-    echo Opret backend\.env med dine database credentials:
-    echo DATABASE_URL=mssql+pyodbc://username:password@server/database?driver=ODBC+Driver+17+for+SQL+Server
-    echo API_HOST=0.0.0.0
-    echo API_PORT=8000
+    echo Kopier .env.example til .env og opdater med dine credentials:
+    echo copy .env.example .env
     echo.
     pause
     exit /b 1
@@ -39,7 +37,7 @@ echo Backend vil vaere tilgaengelig paa: http://localhost:8000
 echo.
 
 REM Start backend in new window
-start "GIDAS Explorer - Backend" cmd /k "cd /d %~dp0 && call venv\Scripts\activate.bat && cd backend && uvicorn main:app --reload --port 8000"
+start "GIDAS Explorer - Backend" cmd /k "cd /d %~dp0 && call venv\Scripts\activate.bat && uvicorn backend.main:app --reload --port 8000"
 
 REM Wait a bit for backend to start
 timeout /t 5 /nobreak >nul

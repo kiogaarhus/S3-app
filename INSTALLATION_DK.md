@@ -53,23 +53,36 @@ Dette vil automatisk:
 - ✅ Installere alle Python dependencies
 - ✅ Installere alle Node.js dependencies
 
-### Trin 4: Konfigurer database forbindelse
+### Trin 4: Konfigurer miljø variabler (.env filer)
 
-1. Naviger til `backend` mappen i dit projekt
-2. Opret en fil kaldet `.env` (bemærk punktummet foran)
-3. Tilføj følgende (tilpas med dine egne værdier):
+#### Backend konfiguration
+Installationsscriptet opretter automatisk en `.env` fil i projektets rod-mappe baseret på `.env.example`.
+
+**Rediger `.env` filen med dine database credentials:**
 
 ```env
-DATABASE_URL=mssql+pyodbc://brugernavn:password@server_navn/database_navn?driver=ODBC+Driver+17+for+SQL+Server
-API_HOST=0.0.0.0
-API_PORT=8000
+# Database Configuration
+GIDAS_DB_URL=mssql+pyodbc://server_navn/database_navn?driver=ODBC+Driver+18+for+SQL+Server&trusted_connection=yes&TrustServerCertificate=yes
 ```
 
-**Eksempel:**
+**Eksempel med Windows Authentication:**
 ```env
-DATABASE_URL=mssql+pyodbc://gidas_user:MinHemligeKode123@sql-server-01.company.com/GIDAS_DB?driver=ODBC+Driver+17+for+SQL+Server
-API_HOST=0.0.0.0
-API_PORT=8000
+GIDAS_DB_URL=mssql+pyodbc://srvsql29/Envidan_Gidas_SpvPlanDyn?driver=ODBC+Driver+18+for+SQL+Server&trusted_connection=yes&TrustServerCertificate=yes
+```
+
+**Eksempel med SQL Server Authentication:**
+```env
+GIDAS_DB_URL=mssql+pyodbc://brugernavn:password@server_navn/database_navn?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes
+```
+
+#### Frontend konfiguration
+Installationsscriptet opretter automatisk en `frontend/.env` fil baseret på `frontend/.env.example`.
+
+**Standard værdier (normalt ingen ændringer nødvendige):**
+```env
+VITE_API_BASE_URL=http://localhost:8000
+VITE_API_CACHE_TTL=300000
+VITE_ENV=development
 ```
 
 ### Trin 5: Start systemet
